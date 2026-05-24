@@ -27,6 +27,7 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: background 0.3s;
+            -webkit-tap-highlight-color: transparent;
         }
         .status {
             font-weight: bold;
@@ -34,12 +35,10 @@
             padding: 5px 10px;
             border-radius: 4px;
         }
-        /* Estilo para quando a tarefa está Pendente */
         .pendente .status {
             background-color: #ffe6e6;
             color: #cc0000;
         }
-        /* Estilo para quando a tarefa está Realizada */
         .realizada {
             background-color: #e6ffe6;
             opacity: 0.8;
@@ -55,38 +54,55 @@
     <h1>Tarefas de Hoje</h1>
     <div id="lista-tarefas"></div>
 
+    <!-- Importa a lista de tarefas do arquivo separado -->
+    <script src="tarefas.js"></script>
+
     <script>
-        // 1. ESCREVA SUAS TAREFAS AQUI (substitua pelos seus afazeres)
-        const minhasTarefas = [
-            "Beber 2L de água",
-            "Fazer exercícios",
-            "Estudar programação",
-            "Ler 10 páginas de um livro"
-        ];
-
         const container = document.getElementById('lista-tarefas');
+        
+        // Pega a data de hoje formatada (Ex: "24/05/2026")
+        const hoje = new Date().toLocaleDateString('pt-BR');
+        
+        // Verifica a data do último acesso salva no navegador
+        const ultimaDataAcesso = localStorage.getItem('ultima_data_acesso');
 
-        // 2. Renderizar as tarefas na tela
-        minhasTarefas.forEach(tarefaTexto => {
+        // Se mudou o dia (ou se é o primeiro acesso), limpa o histórico para resetar tudo
+        if (ultimaDataAcesso !== hoje) {
+            localStorage.removeItem('status_tarefas');
+            localStorage.setItem('ultima_data_acesso', hoje); // Atualiza para o dia atual
+        }
+
+        // Carrega o estado de progresso salvo no dia atual (se houver)
+        let progressoSalvo = JSON.parse(localStorage.getItem('status_tarefas')) || {};
+
+        // Renderiza as tarefas na tela
+        minhasTarefas.forEach((tarefaTexto, index) => {
             const div = document.createElement('div');
-            div.className = 'tarefa pendente';
             
-            div.innerHTML = `
-                <span>${tarefaTexto}</span>
-                <span class="status">A Realizar</span>
-            `;
+            // Verifica se essa tarefa específica já tinha sido marcada como realizada hoje
+            const jaRealizada = progressoSalvo[index] === true;
 
-            // 3. Evento de toque/clique para mudar o status
+            if (jaRealizada) {
+                div.className = 'tarefa realizada';
+                div.innerHTML = `<span>${tarefaTexto}</span><span class="status">Realizado</span>`;
+            } else {
+                div.className = 'tarefa pendente';
+                div.innerHTML = `<span>${tarefaTexto}</span><span class="status">A Realizar</span>`;
+            }
+
+            // Evento de clique / toque na tela
             div.addEventListener('click', () => {
                 if (div.classList.contains('pendente')) {
-                    div.classList.remove('pendente');
-                    div.classList.add('realizada');
+                    div.className = 'tarefa realizada';
                     div.querySelector('.status').innerText = 'Realizado';
+                    progressoSalvo[index] = true;
                 } else {
-                    div.classList.remove('realizada');
-                    div.classList.add('pendente');
+                    div.className = 'tarefa pendente';
                     div.querySelector('.status').innerText = 'A Realizar';
+                    progressoSalvo[index] = false;
                 }
+                // Salva o novo estado no navegador para não perder ao fechar a aba
+                localStorage.setItem('status_tarefas', JSON.stringify(progressoSalvo));
             });
 
             container.appendChild(div);
