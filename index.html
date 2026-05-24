@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Tarefas Diárias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .tarefa {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.3s;
+        }
+        .status {
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        /* Estilo para quando a tarefa está Pendente */
+        .pendente .status {
+            background-color: #ffe6e6;
+            color: #cc0000;
+        }
+        /* Estilo para quando a tarefa está Realizada */
+        .realizada {
+            background-color: #e6ffe6;
+            opacity: 0.8;
+        }
+        .realizada .status {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tarefas de Hoje</h1>
+    <div id="lista-tarefas"></div>
+
+    <script>
+        // 1. ESCREVA SUAS TAREFAS AQUI (substitua pelos seus afazeres)
+        const minhasTarefas = [
+            "Beber 2L de água",
+            "Fazer exercícios",
+            "Estudar programação",
+            "Ler 10 páginas de um livro"
+        ];
+
+        const container = document.getElementById('lista-tarefas');
+
+        // 2. Renderizar as tarefas na tela
+        minhasTarefas.forEach(tarefaTexto => {
+            const div = document.createElement('div');
+            div.className = 'tarefa pendente';
+            
+            div.innerHTML = `
+                <span>${tarefaTexto}</span>
+                <span class="status">A Realizar</span>
+            `;
+
+            // 3. Evento de toque/clique para mudar o status
+            div.addEventListener('click', () => {
+                if (div.classList.contains('pendente')) {
+                    div.classList.remove('pendente');
+                    div.classList.add('realizada');
+                    div.querySelector('.status').innerText = 'Realizado';
+                } else {
+                    div.classList.remove('realizada');
+                    div.classList.add('pendente');
+                    div.querySelector('.status').innerText = 'A Realizar';
+                }
+            });
+
+            container.appendChild(div);
+        });
+    </script>
+</body>
+</html>
